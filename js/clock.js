@@ -2,18 +2,33 @@
 var winWidth=1024;
 var winHeight=760;
 var r=4;
+var CurrentTime=new Date();//获取当前时间
+
 window.onload=function(){
     var canvas=document.getElementById('canvas');
     var cxt=canvas.getContext('2d');
     canvas.width=winWidth;
     canvas.height=winHeight;
-    t=setInterval(function(){cxt.clearRect(0,0,winWidth,winHeight);render(cxt);},1000)
+    //设置动画
+    setInterval(function(){
+        render(cxt);
+        update();
+    },1000)
 }
+
+//获取更新
+function update(){
+    var updateTime=new Date();
+    if(updateTime.getTime()!=CurrentTime.getTime())
+        CurrentTime=new Date(updateTime.getTime());
+}
+
+//渲染页面
 function render (context) {
-    var date=new Date();
-    var hour=date.getHours();
-    var min=date.getMinutes();
-    var sec=date.getSeconds();
+    context.clearRect(0,0,winWidth,winHeight)
+    var hour=CurrentTime.getHours();
+    var min=CurrentTime.getMinutes();
+    var sec=CurrentTime.getSeconds();
     console.log(hour,min,sec)
     //获取小时的两位数
     var hourFirst=Math.floor(hour/10);
@@ -37,6 +52,7 @@ function render (context) {
 
 
 }
+//构建数字
 function drawDigit (x,y,num,cxt) {
     var num=digit[num];
     for(var i=0;i<num.length;i++){
