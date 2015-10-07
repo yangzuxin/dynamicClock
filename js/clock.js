@@ -16,7 +16,7 @@ window.onload=function(){
     setInterval(function(){
         render(cxt);
         update();
-    },1000)
+    },50)
 }
 
 //获取更新
@@ -73,8 +73,41 @@ function update(){
         }
         CurrentTime=updateTime;
     }
+    //更新小球状态
+    updateBalls();
 }
 
+//跟新小球状态
+function updateBalls(){
+    for(var i=0;i<balls.length;i++){
+        balls[i].x+=balls[i].vx;
+        balls[i].y+=balls[i].vy;
+        balls[i].vy+=balls[i].g;
+        if(balls[i].y>=(winHeight-r)){
+            balls[i].y=winHeight-r;
+            balls[i].vy=-balls[i].vy*0.5;
+        }
+    }
+}
+
+//添加变化彩色小球
+function addBalls (x,y,num) {
+    for (var i=0; i < digit[num].length; i++) {
+        for(var j=0;j<digit[num][i].length;j++){
+            if(digit[num][i][j]==1){
+                var ball={
+                    x:x+j*2*(r+1)+(r+1),
+                    y:y+i*2*(r+1)+(r+1),
+                    g:1.5+Math.random(),
+                    vx:Math.pow( -1 , Math.ceil( Math.random()*1000 ) ) * 4,
+                    vy:-5,
+                    color: colors[ Math.floor( Math.random()*colors.length )]
+                }
+                balls.push(ball);
+            }
+        }
+    };
+}
 //渲染页面
 function render (context) {
     //清除画布
@@ -82,7 +115,6 @@ function render (context) {
     var hour=CurrentTime.getHours();
     var min=CurrentTime.getMinutes();
     var sec=CurrentTime.getSeconds();
-    console.log(hour,min,sec)
     //获取小时的两位数
     var hourFirst=Math.floor(hour/10);
     var hourLast=hour%10;
@@ -92,8 +124,6 @@ function render (context) {
     //获取秒的两位数
     var secFirst=Math.floor(sec/10);
     var secLast=sec%10;
-
-    console.log(hourFirst,hourLast,minFirst,minLast,secFirst,secLast)
     //绘制时钟
     drawDigit(MARGIN_LEFT,MARGIN_TOP,hourFirst,context);
     drawDigit(MARGIN_LEFT + 15*(r+1),MARGIN_TOP,hourLast,context);
@@ -103,10 +133,27 @@ function render (context) {
     drawDigit(MARGIN_LEFT + 69*(r+1),MARGIN_TOP,10,context);
     drawDigit(MARGIN_LEFT + 78*(r+1),MARGIN_TOP,secFirst,context);
     drawDigit(MARGIN_LEFT + 93*(r+1),MARGIN_TOP,secLast,context);
-
-
+    //绘制小球
+    for(var i=0;i<balls.length;i++){
+        context.fillStyle=balls[i].color;
+        context.beginPath();
+        context.arc(balls[i].x,balls[i].y,r,0,2*Math.PI);
+        context.closePath();
+        context.fill();
+    }
 }
-//构建数字
+//绘制彩色小球
+/*function drawCircle(cxt) {
+    for(var i=0;i<balls.length;i++){
+        cxt.fillStyle=balls[i].color;
+        cxt.beginPath();
+        cxt.arc(balls[i].x,balls[i].y,r,0,2*Math.PI);
+        cxt.closePath();
+        cxt.fill();
+    }
+}*/
+
+//绘制数字
 function drawDigit (x,y,num,cxt) {
     var num=digit[num];
     for(var i=0;i<num.length;i++){
@@ -122,7 +169,3 @@ function drawDigit (x,y,num,cxt) {
     }
 }
 
-//添加变化彩色小球
-function addBalls () {
-    // body...
-}
